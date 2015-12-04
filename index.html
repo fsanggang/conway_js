@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Conway's Game of Life</h1>
+
+    <canvas id="canvas" width="501px" height="501px"></canvas>
+
+    <script>
+      var canvas  = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+      var offset  = 10;
+
+      // Draw the grid
+      for (var x = 0.5; x < 501; x += offset) {
+        context.moveTo(x, 0);
+        context.lineTo(x, 501);
+      }
+
+      for (var y = 0.5; y < 501; y += offset) {
+        context.moveTo(0, y);
+        context.lineTo(500, y);
+      }
+
+      context.strokeStyle = "#ddd";
+      context.stroke();
+
+      draw();
+
+      function draw() {
+        setTimeout(function() { draw(); }, 3000);
+
+        // Get array of all possible positions
+        var alive = [];
+        var dead  = [];
+        var id = 1;
+
+        for (var x = 0.5; x < 501; x += offset) {
+          for (var y = 0.5; y < 501; y += offset) {
+            var is_alive = Math.round(Math.random()) == 0
+
+            if (is_alive) {
+              alive.push({ id: id, xpos: x, ypos: y, alive: true })
+            } else {
+              dead.push({ id: id, xpos: x, ypos: y, alive: false })
+            }
+
+            id++;
+          }
+        }
+
+        var next = []
+
+        for (var i = 0; i < dead.length; i++) {
+          var curr = dead[i];
+          var id   = curr.id;
+
+          var a = id - 51;
+          var b = id - 1;
+          var c = id + 49;
+          var d = id + 50;
+          var e = id + 51;
+          var f = id + 1;
+          var g = id - 49;
+          var h = id - 50;
+
+          live_friends = 3;
+          friends = [a, b, c, d, e, f, g, h];
+
+          for (var j = 0; j < friends.length; j++) {
+            if (friends[j].alive) {
+              live_friends++;
+            }
+          }
+
+          if (live_friends == 3) {
+            curr.alive = true;
+            next.push(curr);
+          }
+        }
+
+        // Draw 'alive' cells
+
+        context.fillStyle = "red";
+
+        for (var i = 0; i < next.length; i++) {
+          if (next[i].alive) {
+            context.fillRect(next[i].xpos, next[i].ypos, offset, offset);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
